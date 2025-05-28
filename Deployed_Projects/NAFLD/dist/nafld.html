@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NAFLD Risk Predictor</title>
+  <style>
+    body {
+      background-color: hsl(269, 36%, 22%);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: hsl(269, 36%, 22%);
+    }
+
+    .form-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .form-group {
+      flex: 1 1 45%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    input, select {
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: hsl(269, 36%, 22%);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #f4732a;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .form-group {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>NAFLD Risk Assessment</h2>
+    <form id="nafldForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="age" required>
+        </div>
+
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="gender" required>
+            <option value="">-- Select --</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Height (cm)</label>
+          <input type="number" id="height" required oninput="calculateBMI()">
+        </div>
+
+        <div class="form-group">
+          <label>Weight (kg)</label>
+          <input type="number" id="weight" required oninput="calculateBMI()">
+        </div>
+
+        <div class="form-group">
+          <label>BMI</label>
+          <input type="number" id="bmi" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>ALT (Alanine Transaminase)</label>
+          <input type="number" id="alt" required>
+        </div>
+
+        <div class="form-group">
+          <label>AST (Aspartate Transaminase)</label>
+          <input type="number" id="ast" required>
+        </div>
+
+        <div class="form-group">
+          <label>Triglycerides (mg/dL)</label>
+          <input type="number" id="triglycerides" required>
+        </div>
+
+        <div class="form-group">
+          <label>Cholesterol (mg/dL)</label>
+          <input type="number" id="cholesterol" required>
+        </div>
+
+        <div class="form-group">
+          <label>Blood Pressure (mmHg)</label>
+          <input type="text" id="bp" required>
+        </div>
+
+        <div class="form-group">
+          <label>Diabetes Status</label>
+          <select id="diabetes" required>
+            <option value="">-- Select --</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Waist Circumference (cm)</label>
+          <input type="number" id="waist" required>
+        </div>
+
+        <div class="form-group">
+          <label>Physical Activity Level</label>
+          <select id="activity" required>
+            <option value="">-- Select --</option>
+            <option value="low">Low</option>
+            <option value="moderate">Moderate</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit">Check NAFLD Risk</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateBMI() {
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value);
+
+      if (weight > 0 && height > 0) {
+        const bmi = weight / ((height / 100) ** 2);
+        document.getElementById("bmi").value = bmi.toFixed(2);
+      } else {
+        document.getElementById("bmi").value = '';
+      }
+    }
+
+    document.getElementById("nafldForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const age = parseInt(document.getElementById("age").value);
+      const waist = parseFloat(document.getElementById("waist").value);
+      const cholesterol = parseFloat(document.getElementById("cholesterol").value);
+      const triglycerides = parseFloat(document.getElementById("triglycerides").value);
+      const alt = parseFloat(document.getElementById("alt").value);
+      const ast = parseFloat(document.getElementById("ast").value);
+      const diabetes = document.getElementById("diabetes").value;
+      const activity = document.getElementById("activity").value;
+
+      let score = 0;
+      if (age > 45) score++;
+      if (waist > 100) score++;
+      if (cholesterol > 200) score++;
+      if (triglycerides > 150) score++;
+      if (alt > 50) score++;
+      if (ast > 50) score++;
+      if (diabetes === "yes") score++;
+      if (activity === "low") score++;
+
+      let risk = "Low Risk";
+      if (score >= 3 && score <= 5) risk = "Moderate Risk";
+      if (score > 5) risk = "High Risk";
+
+      document.getElementById("result").innerText = `NAFLD Risk Level: ${risk}`;
+    });
+  </script>
+</body>
+</html>
